@@ -3,19 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --color-text: #ffffff;
+    --color-error: #980000;
+    --color-paper: #232323;
+    --color-primary: #009688;
+    --color-background: #000000;
+    --color-primary-contrast: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html[light] {
+    --color-text: #000000;
+    --color-error: #980000;
+    --color-paper: #ffffff;
+    --color-primary: #009688;
+    --color-background: #c5c4c4;
+    --color-primary-contrast: #ffffff;
 }
 
+html,
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+    @apply bg-background text-text w-screen h-screen underline-offset-4
+}
+
+a {
+    @apply hover:underline active:opacity-50 transition-opacity
+}
+
+button {
+  @apply bg-primary p-2 border rounded
+}
+
+input {
+  @apply text-background
 }

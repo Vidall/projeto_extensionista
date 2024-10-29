@@ -1,101 +1,116 @@
-import Image from "next/image";
+'use client';
+
+import DicasAbaixoPeso from "@/components/DicasAbaixoPeso";
+import ReturnCard from "@/components/DicasAbaixoPeso";
+import DicasObesidade from "@/components/DicasObesidade";
+import DicasPesoNormal from "@/components/DicasPesoNormal";
+import DicasSobrepeso from "@/components/DicasSobrepeso";
+import { CalcularIMC } from "@/utilities/CalcularIMC";
+import React, { Component, useEffect, useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [altura, setAltura] = useState("");
+  const [peso, setPeso] = useState("");
+  const [imc, setImc] = useState("");
+  const [nivelImc, setNivelIMC] = useState<number | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const tabIMC: { [key: number]: string } = {
+    1: "peso baixo",
+    2: "Peso normal",
+    3: "Sobrepeso",
+    4: "Obesidade"
+  };
+  
+
+  const handleCalcularIMC = (e: React.FormEvent) => {
+    e.preventDefault(); // Evita o recarregamento da página
+    const alturaNum = parseFloat(altura);
+    const pesoNum = parseFloat(peso);
+
+    if (alturaNum > 0 && pesoNum > 0) {
+      const resultado = CalcularIMC(alturaNum, pesoNum);
+      setImc(resultado.toFixed(2)); // Armazena o IMC com duas casas decimais
+    } else {
+      setImc("Valores inválidos");
+    }
+  };
+
+  useEffect(() => {
+    const imcNum = parseFloat(imc);
+    if (!isNaN(imcNum)) {
+      if (imcNum < 18.5) {
+        setNivelIMC(1);
+      } else if (imcNum >= 18.5 && imcNum <= 24.9) {
+        setNivelIMC(2);
+      } else if (imcNum >= 25 && imcNum <= 29.9) {
+        setNivelIMC(3);
+      } else if (imcNum >= 30) {
+        setNivelIMC(4);
+      }
+    }
+  }, [imc]);
+
+  return (
+    <div className="flex flex-col justify-center items-center p-4 pt-10">
+      <div>
+        <h4 className="flex justify-center">Calcular IMC</h4>
+        <form
+          onSubmit={handleCalcularIMC}
+          className="flex flex-col items-center justify-center bg-slate-700 gap-4 h-48 p-4 border rounded"
+        >
+          <div>
+            <label htmlFor="altura">Altura (em metros):</label>
+            <input
+              type="number"
+              id="altura"
+              value={altura}
+              onChange={(e) => setAltura(e.target.value)}
+              placeholder="Altura"
+              className="border mx-1 px-1"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+
+          <div>
+            <label htmlFor="peso">Peso (em kg):</label>
+            <input
+              type="number"
+              id="peso"
+              placeholder="Peso em kg"
+              onChange={(e) => setPeso(e.target.value)}
+              value={peso}
+              className="border mx-1 px-1"
+            />
+          </div>
+
+          <button type="submit" className="bg-primary">
+            Calcular
+          </button>
+        </form>
+      </div>
+
+      {imc && (
+        <div className="mt-4">
+          <p>Seu IMC é: {imc}</p>
+          {nivelImc && <p className="mb-2">Você está com: <strong>{tabIMC[nivelImc]}</strong></p>}
+          { nivelImc === 1 &&(
+            <DicasAbaixoPeso/>
+          )}
+          { nivelImc === 2 && (
+            <DicasPesoNormal/>
+          )
+          }
+          { nivelImc === 3 && (
+            <DicasSobrepeso/>
+          )
+          }
+          { nivelImc === 4 && (
+            <DicasObesidade/>
+          )
+          }
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        
+      )}
     </div>
   );
 }
